@@ -39,4 +39,24 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   TODO:
     * Calculate a Jacobian here.
   */
+  
+  // x = [x, y, vx, vy]'
+  // z = [ro, theta, ro_dot]'
+  // ro = sqrt(x^2+y^2)
+  // theta = atan2(y, x)
+  
+  // Compute Jacobian Hj
+  double x = x_state(0);
+  double y = x_state(1);
+  double vx = x_state(2);
+  double vy = x_state(3);
+  double ro = std::hypot(x, y);
+  double ro_dot = (x*vx+y*vy)/ro;
+  Eigen::MatrixXd Hj(3, 4);
+  Hj.row(0) << x/ro, y/ro, 0, 0;
+  double ro2 = x*x+y*y;
+  double ro3 = std::pow(ro, 3);
+  Hj.row(1) << -y/ro2, x/ro2, 0, 0;
+  Hj.row(2) << y*(vx*y-vy*x)/ro3, x*(vy*x-vx*y)/ro3, x/ro, y/ro;
+  return Hj;
 }

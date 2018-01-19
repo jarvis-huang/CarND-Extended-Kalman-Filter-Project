@@ -33,13 +33,11 @@ void KalmanFilter::Update(const VectorXd &z) {
   /**
     * update the state by using Kalman Filter equations
   */
-  std::cout << "C" << std::endl;
   Eigen::VectorXd y = z - H_ * x_; // innovation
   Eigen::MatrixXd S = H_ * P_ * H_.transpose() + R_;
   Eigen::MatrixXd K = P_ * H_.transpose() * S.inverse();
   x_ += K * y;
   P_ = (MatrixXd::Identity(x_.size(), x_.size()) - K*H_) * P_;
-  std::cout << "D" << std::endl;
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
@@ -51,9 +49,6 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   // ro = sqrt(x^2+y^2)
   // theta = atan2(y, x)
   
-  std::cout << "A" << std::endl;
-  
-  // Compute Jacobian Hj
   double _x = x_(0);
   double _y = x_(1);
   double vx = x_(2);
@@ -63,19 +58,16 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   while (theta<-M_PI) theta+=2*M_PI;
   while (theta>M_PI) theta-=2*M_PI;
   double ro_dot = (_x*vx+_y*vy)/ro;
-  Eigen::MatrixXd Hj(3, 4);
-  Hj.row(0) << _x/ro, _y/ro, 0, 0;
-  double ro2 = _x*_x+_y*_y;
-  double ro3= std::pow(ro, 3);
-  Hj.row(1) << -_y/ro2, _x/ro2, 0, 0;
-  Hj.row(2) << _y*(vx*_y-vy*_x)/ro3, _x*(vy*_x-vx*_y)/ro3, _x/ro, _y/ro;
-  
+
   Eigen::VectorXd z_(z.size());
   z_ << ro, theta, ro_dot;
   Eigen::VectorXd y = z - z_; // innovation
-  Eigen::MatrixXd S = Hj * P_ * Hj.transpose() + R_;
-  Eigen::MatrixXd K = P_ * Hj.transpose() * S.inverse();
+  // Normalize angle difference
+  while (y(1)<-M_PI) y(1)+=2*M_PI;
+  while (y(1)>M_PI) y(1)-=2*M_PI;  
+  Eigen::MatrixXd S = H_ * P_ * H_.transpose() + R_;
+  Eigen::MatrixXd K = P_ * H_.transpose() * S.inverse();
   x_ += K * y;
-  P_ = (MatrixXd::Identity(x_.size(), x_.size()) - K*Hj) * P_;
-  std::cout << "B" << std::endl;
+  P_ = (MatrixXd::Identity(x_.size(), x_.size()) - K*H_) * P_;
+  
 }

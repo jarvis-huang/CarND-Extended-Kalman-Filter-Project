@@ -1,3 +1,3 @@
-- [ ] Tracking stalls in the middle with laser-only measurements.
+- [x] Tracking stalls in the middle with laser-only measurements.
 - [x] Radar measurement causes seg fault.
-- [ ] Finish CalculateJacobian in tools.cpp
+- [x] Finish CalculateJacobian in tools.cpp
