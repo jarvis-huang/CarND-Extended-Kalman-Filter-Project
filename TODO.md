@@ -1,3 +1,5 @@
 - [x] Tracking stalls in the middle with laser-only measurements.
 - [x] Radar measurement causes seg fault.
 - [x] Finish CalculateJacobian in tools.cpp
+- [ ] NIS
+- [ ] Estimate Q and R.
